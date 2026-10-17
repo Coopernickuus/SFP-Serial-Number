@@ -7,6 +7,16 @@ let scanQueue = Promise.resolve();
 let pendingScans = 0;
 let importBusy = false;
 let resetBusy = false;
+let scannerTailUntil = 0;
+
+function focusScanner() {
+  const input = $("scan");
+  input.focus({preventScroll: true});
+  if (!input.value) {
+    input.scrollLeft = 0;
+    input.scrollTop = 0;
+  }
+}
 
 function updateControls() {
   $("scan").disabled = resetBusy;
@@ -81,7 +91,8 @@ function submitScan() {
   if (!text.trim()) return;
   // Girdi hemen boşalır; ikinci okuma ilk isteğin yanıtı beklenirken de korunur.
   $("scan").value = "";
-  $("scan").focus();
+  scannerTailUntil = performance.now() + 250;
+  focusScanner();
   pendingScans += 1;
   updateControls();
   scanQueue = scanQueue.then(async () => {
@@ -107,25 +118,11 @@ function insertControl(character) {
 
 $("save").addEventListener("click", submitScan);
 $("scan").addEventListener("keydown", (event) => {
-  // USB HID okuyucularının bazıları ASCII kontrol karakterlerini Ctrl birleşimi olarak yollar.
-  if (event.ctrlKey && !event.altKey && !event.metaKey) {
-    const key = event.key.toLowerCase();
-    if (key === "]" || event.code === "BracketRight") {
-      event.preventDefault(); insertControl("␝"); return;
-    }
-    if (key === "^" || (event.shiftKey && event.code === "Digit6")) {
-      event.preventDefault(); insertControl("␞"); return;
-    }
-    if (key === "d") { event.preventDefault(); insertControl("␄"); return; }
-    if (key === "m" || key === "j") { event.preventDefault(); submitScan(); return; }
-  }
-  if (event.key === "Tab") {
-    // Bazı okuyucular GS'yi Tab'a dönüştürür; tahmin ederek yanlış seri üretmeyiz.
-    return;
-  }
-  if (event.key === "Enter" && !event.shiftKey && !event.isComposing) {
-    event.preventDefault(); submitScan();
-  }
+  const action = SFPScanner.keyAction(event, $("scan").value, performance.now() < scannerTailUntil);
+  if (action.type === "pass") return;
+  event.preventDefault();
+  if (action.type === "insert") insertControl(action.text);
+  else if (action.type === "submit") submitScan();
 });
 $("scan").addEventListener("paste", (event) => {
   const text = event.clipboardData.getData("text/plain");
@@ -157,7 +154,7 @@ $("file").addEventListener("change", async () => {
     showReport(await api("/api/import", {filename: file.name, data: dataUrl.split(",")[1]}));
     await refresh();
   } catch (error) { feedback("Dosya alınamadı.", error.message, "error"); }
-  finally { $("file").value = ""; importBusy = false; updateControls(); $("scan").focus(); }
+  finally { $("file").value = ""; importBusy = false; updateControls(); focusScanner(); }
 });
 $("copy").addEventListener("click", async () => {
   try {
@@ -201,7 +198,7 @@ $("reset").addEventListener("click", async () => {
   } finally {
     resetBusy = false;
     updateControls();
-    $("scan").focus();
+    focusScanner();
   }
 });
 refresh().catch((error) => feedback("Liste yüklenemedi.", "Uygulamanın çalıştığını kontrol edin. " + error.message, "error"));

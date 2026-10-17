@@ -27,6 +27,7 @@ from xml.etree import ElementTree as ET
 ROOT = Path(__file__).resolve().parent
 DEFAULT_DB = ROOT / "data" / "seri_numaralari.sqlite3"
 APP_ID = "sfp-serial-number"
+APP_VERSION = "1.1.0"
 GS, RS, EOT = "\x1d", "\x1e", "\x04"
 MAX_UPLOAD = 20 * 1024 * 1024
 MAX_EXPANDED = 60 * 1024 * 1024
@@ -43,17 +44,19 @@ def normalize(text):
 
 
 def extract_serial(record):
-    """Tam olarak GS + S + değer + GS alanını okur; baştaki S veri değildir."""
+    """GS veya okuyucunun ] ayracındaki S alanını, bir sonraki ayırıcıya kadar okur."""
     record = normalize(record)
-    fields = list(re.finditer(r"\x1dS([^\x1d\x1e\x04\r\n]*)\x1d", record))
-    # Lookahead makes adjacent S fields detectable as well.
-    starts = list(re.finditer(r"\x1d(?=S)", record))
+    # Gerçek GS mevcutsa ] bir veri karakteri olabilir; onu değiştirmeyiz.
+    separator = GS if GS in record else "]"
+    escaped = re.escape(separator)
+    fields = list(re.finditer(escaped + r"S([^" + escaped + r"\x1e\x04\r\n]*)" + escaped, record))
+    starts = list(re.finditer(escaped + r"(?=S)", record))
     if len(starts) > 1:
         raise ValueError("Bir karekodda birden fazla S alanı var; kayıt kontrol edilmeli.")
     if not fields:
-        if GS not in record:
-            raise ValueError("␝ (GS) ayırıcısı bulunamadı. Okuyucunun ayırıcıları ilettiğini kontrol edin.")
-        raise ValueError("␝S ile başlayıp ␝ ile biten dolu bir seri numarası alanı bulunamadı.")
+        if GS not in record and "]" not in record:
+            raise ValueError("␝ (GS) veya ] ayırıcısı bulunamadı. Okuyucunun ayırıcıları ilettiğini kontrol edin.")
+        raise ValueError("␝S…␝ veya ]S…] biçiminde tamamlanmış bir seri numarası alanı bulunamadı.")
     serial = fields[0].group(1)
     if not serial or len(serial) > 256 or any(c.isspace() or ord(c) < 32 or ord(c) == 127 for c in serial):
         raise ValueError("Seri numarası boş, çok uzun veya boşluk/kontrol karakteri içeriyor.")
@@ -69,7 +72,7 @@ def parse_text(text, source="Okuyucu", ignore_other=False):
     result = {"items": [], "errors": [], "ignored": 0}
     for index, record in enumerate(records, 1):
         location = source if len(records) == 1 else f"{source} / kayıt {index}"
-        if ignore_other and GS not in record and "[)>" not in record:
+        if ignore_other and GS not in record and "]S" not in record and "[)>" not in record:
             result["ignored"] += 1
             continue
         try:
@@ -264,11 +267,11 @@ def make_handler(store, token):
                 return self.send(403, {"error": "Geçersiz adres."})
             parts = urlsplit(self.path)
             if parts.path == "/api/instance":
-                return self.send(200, {"app": APP_ID, "database": str(store.path)})
+                return self.send(200, {"app": APP_ID, "version": APP_VERSION, "database": str(store.path)})
             if parts.path == "/":
                 content = (ROOT / "ui" / "index.html").read_text(encoding="utf-8").replace("__TOKEN__", token)
                 return self.send(200, content.encode("utf-8"), "text/html; charset=utf-8")
-            if parts.path in ("/app.js", "/style.css"):
+            if parts.path in ("/app.js", "/scanner_input.js", "/style.css"):
                 file = ROOT / "ui" / parts.path[1:]
                 return self.send(200, file.read_bytes(), "text/javascript; charset=utf-8" if file.suffix == ".js" else "text/css; charset=utf-8")
             if parts.path == "/api/records":

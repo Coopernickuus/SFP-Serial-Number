@@ -22,13 +22,42 @@ SAMPLES = [
     ("[)>␞06␝1P471880A.101␝SHA20230241879␝10D2023␝52PMXPD-243SI01␝1V9W␝18VLENSN␝4LCN␞␄", "HA20230241879"),
 ]
 
+SCANNER_SAMPLES = [
+    ("[)>6]1P471880A.101]SHA20230240976]Q1]10D2023]52PMXPD-243SI01]1V9W]18VLENSN]4LCN", "HA20230240976"),
+    ("[)>6]1P471880A.101]SMA18210960908]Q1]10D1821]52PMXPD-243SI01]1V9W]18VLENSN]4LCN", "MA18210960908"),
+    ("[)>6]1P471880A.101]SFR202936065]Q1]10D2029]52PRTXM191-404-C40]18VLENSN]4LCN", "FR202936065"),
+    ("[)>6]1P471880A.101]SHA20230241879]10D2023]52PMXPD-243SI01]1V9W]18VLENSN]4LCN", "HA20230241879"),
+    ("[)>6]1P471880A.101]S1000082001138]10D2309]52PMXPD-243SI01]1V9W]18VLENSN]4LCN", "1000082001138"),
+]
+
 
 class ExtractionTests(unittest.TestCase):
     def test_all_user_samples_and_encodings(self):
         for raw, expected in SAMPLES:
-            for separator in ("␝", "\x1d", "_x001D_", r"\x1d", r"\u001d"):
+            for separator in ("␝", "\x1d", "_x001D_", r"\x1d", r"\u001d", "]"):
                 with self.subTest(serial=expected, separator=separator):
                     self.assertEqual(app.extract_serial(raw.replace("␝", separator)), expected)
+
+    def test_exact_scanner_outputs_match_previous_serials(self):
+        expected = [SAMPLES[i][1] for i in (2, 3, 1, 4, 0)]
+        actual = [app.extract_serial(raw) for raw, _ in SCANNER_SAMPLES]
+        self.assertEqual(actual, expected)
+        self.assertTrue(all("]" not in serial and "Q1" not in serial and "10D" not in serial for serial in actual))
+
+    def test_scanner_batch_and_mixed_separator_records(self):
+        for joiner in ("\n", "\r\n", ""):
+            parsed = app.parse_text(joiner.join(raw for raw, _ in SCANNER_SAMPLES))
+            self.assertEqual([i["serial"] for i in parsed["items"]], [s for _, s in SCANNER_SAMPLES])
+            self.assertEqual(parsed["errors"], [])
+        parsed = app.parse_text(SAMPLES[0][0] + "\n" + SCANNER_SAMPLES[0][0])
+        self.assertEqual([i["serial"] for i in parsed["items"]], [SAMPLES[0][1], SCANNER_SAMPLES[0][1]])
+
+    def test_bracket_boundaries_reject_partial_or_ambiguous_serials(self):
+        for raw in ("[)>6]S123", "]S]Q1", "]S123]S456]", "]S123]Q1]S456]", "]S12 3]Q1"):
+            with self.subTest(raw=raw), self.assertRaises(ValueError):
+                app.extract_serial(raw)
+        self.assertEqual(app.extract_serial("]SS000123]10D2309"), "S000123")
+        self.assertEqual(app.extract_serial("␝SAB]12␝Q1"), "AB]12")
 
     def test_only_field_prefix_is_removed(self):
         for serial in ("0000123", "S123", "s123", "AB-123.4/5"):
@@ -53,6 +82,15 @@ class ExtractionTests(unittest.TestCase):
 
 
 class FileTests(unittest.TestCase):
+    def test_bracket_scanner_file_and_cells(self):
+        text = "\n".join(raw for raw, _ in SCANNER_SAMPLES)
+        parsed = app.parse_file("okuyucu.txt", text.encode("utf-8"))
+        self.assertEqual([i["serial"] for i in parsed["items"]], [s for _, s in SCANNER_SAMPLES])
+        parsed = app.parse_file("okuyucu.csv", ("Karekod\n" + text).encode("utf-8"))
+        self.assertEqual(len(parsed["items"]), 5)
+        self.assertEqual(parsed["errors"], [])
+        self.assertEqual(app.parse_text("]S000123]Q1", ignore_other=True)["items"][0]["serial"], "000123")
+
     def test_real_user_workbook(self):
         source = app.ROOT / "SFP Seri Numaralar.xlsx"
         if not source.exists():
@@ -167,6 +205,14 @@ class HttpTests(unittest.TestCase):
         self.assertEqual(json.loads(data)["added"], [SAMPLES[1][1]])
         self.assertEqual(json.loads(self.request("GET", "/api/records")[1])["total"], 2)
         self.assertEqual(self.request("GET", "/export?format=txt")[1].decode().splitlines(), [s for _, s in SAMPLES[:2]])
+
+    def test_scanner_batch_api_and_keyboard_script(self):
+        raw = "\n".join(raw for raw, _ in SCANNER_SAMPLES)
+        status, body = self.request("POST", "/api/scan", {"text": raw})
+        self.assertEqual(status, 200)
+        self.assertEqual(json.loads(body)["added"], [s for _, s in SCANNER_SAMPLES])
+        self.assertEqual(self.request("GET", "/export?format=txt")[1].decode().splitlines(), [s for _, s in SCANNER_SAMPLES])
+        self.assertEqual(self.request("GET", "/scanner_input.js")[0], 200)
 
     def test_reset_requires_confirmation_and_current_count(self):
         self.store.save(app.parse_text(SAMPLES[0][0]))

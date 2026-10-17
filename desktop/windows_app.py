@@ -69,10 +69,11 @@ def smoke_test(result_path):
     """Paketlenmiş EXE'yi mevcut kullanıcı listesine dokunmadan denetler."""
     import http.client
     root = assets_root()
-    for name in ("index.html", "app.js", "style.css"):
+    for name in ("index.html", "scanner_input.js", "app.js", "style.css"):
         if not (root / "ui" / name).is_file():
             raise RuntimeError(f"Arayüz dosyası eksik: {name}")
     assert app.extract_serial("␝SSMOKE001␝Q1") == "SMOKE001"
+    assert app.extract_serial("[)>6]1PDEMO]SSMOKE002]Q1]4LCN") == "SMOKE002"
     with tempfile.TemporaryDirectory() as directory:
         store = app.SerialStore(Path(directory) / "smoke.sqlite3")
         server, url = app.start_server(store, 0)

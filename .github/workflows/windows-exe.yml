@@ -19,6 +19,8 @@ jobs:
         run: python -m unittest discover -s tests -v
         env:
           PYTHONUTF8: '1'
+      - name: Okuyucu tuşlarını test et
+        run: node --test tests/scanner_input.test.cjs
       - name: EXE oluştur ve doğrula
         run: python desktop/build_windows.py
         env:

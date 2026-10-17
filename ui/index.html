@@ -6,19 +6,20 @@
   <meta name="sfp-token" content="__TOKEN__">
   <title>SFP · Seri Numaraları</title>
   <link rel="stylesheet" href="/style.css">
+  <script src="/scanner_input.js" defer></script>
   <script src="/app.js" defer></script>
 </head>
 <body>
   <main>
     <header><div class="brand"><span class="mark" aria-hidden="true">▥</span> SFP <span class="brand-divider">/</span> Seri Numaraları</div><span class="local"><i></i> Bu bilgisayarda kaydedilir</span></header>
-    <section class="intro"><p class="eyebrow">KAREKODDAN KAYDA</p><h1>Okutun. Seri numarası kaydedilsin.</h1><p>Karekod içindeki <code>␝S…␝</code> alanı ayıklanır. Baştaki S çıkarılır, seri numarası listenize eklenir.</p></section>
+    <section class="intro"><p class="eyebrow">KAREKODDAN KAYDA</p><h1>Okutun. Seri numarası kaydedilsin.</h1><p>Karekod içindeki <code>␝S…␝</code> veya <code>]S…]</code> alanı ayıklanır. Baştaki S çıkarılır, seri numarası listenize eklenir.</p></section>
     <div class="inputs">
       <section class="card scan-card">
         <div class="section-heading"><span class="step">01</span><h2>Karekod okut</h2><span id="focus-state" class="focus-state">Okuyucu hazır</span></div>
         <label for="scan">Okuyucuyla bu alana okutun veya karekod metnini yapıştırın.</label>
-        <textarea id="scan" rows="4" autofocus spellcheck="false" autocomplete="off" placeholder="[)>␞06␝1P…␝S…␝…"></textarea>
-        <div class="scan-actions"><span><kbd>Enter</kbd> kaydeder · <kbd>Shift + Enter</kbd> yeni satır</span><button id="save" class="primary">Seri numarasını ekle <span aria-hidden="true">↗</span></button></div>
-        <details><summary>Okuyucu ayarı ve ayırıcı karakterler</summary><p>Okuyucuyu klavye (USB HID) modunda, okuma sonunda <strong>Enter</strong> gönderecek şekilde kullanın. GS ayırıcısı (ASCII 29) veride korunmalıdır. Görünen ␝ karakteri de kabul edilir. GS siliniyorsa okuyucu ayarından ␝ karakterine dönüştürün. Bu ayar cihaz modeline göre değişir.</p><p>Alan odaktayken Ctrl+] ile GS gönderen okuyucular da desteklenir. İlk fiziksel okutmayı bilinen bir seri numarasıyla karşılaştırın.</p></details>
+        <textarea id="scan" rows="4" wrap="soft" dir="ltr" autofocus spellcheck="false" autocomplete="off" placeholder="[)>6]1P…]S…]…"></textarea>
+        <div class="scan-actions"><span><kbd>Enter / Tab</kbd> kaydeder · <kbd>Shift + Enter</kbd> yeni satır</span><button id="save" class="primary">Seri numarasını ekle <span aria-hidden="true">↗</span></button></div>
+        <details><summary>Okuyucu ayarı ve ayırıcı karakterler</summary><p>Okuyucuyu klavye (USB HID) modunda, okuma sonunda <strong>Enter</strong> gönderecek şekilde kullanın. Görünen ␝, gerçek GS (ASCII 29) ve okuyucunuzdaki <strong>]</strong> ayracı desteklenir. Seri numarası S'den sonraki ilk ayırıcıda biter; Q1 veya 10D alanları alınmaz.</p><p>Bu giriş alanında karekodun sonundaki Tab da kaydeder ve odak girişte kalır. Excel'de hücreler arasında ilerleme varsa okuyucunun okuma sonu (suffix) ayarını kontrol edin; cihaz ayarı modele göre değişir.</p></details>
       </section>
       <section class="card import-card">
         <div class="section-heading"><span class="step">02</span><h2>Dosyadan aktar</h2></div>

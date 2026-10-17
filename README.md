@@ -1,6 +1,6 @@
 # SFP Seri Numaraları
 
-Karekod içindeki `␝S` ile sonraki `␝` arasını alır, baştaki alan tanımlayıcı `S` harfini çıkarır. Örneğin `␝SHA20230241879␝` → `HA20230241879`.
+Sürüm **1.1.0**. Karekod içindeki `␝S` ile sonraki `␝` veya `]S` ile sonraki `]` arasını alır, baştaki alan tanımlayıcı `S` harfini çıkarır. Örneğin `]SHA20230241879]10D2023` → `HA20230241879`. Sabit seri uzunluğu kullanılmaz; Q1/10D ve sonraki alanlar alınmaz. [Okuyucu örnekleri ve güncelleme notları](OKUYUCU_NOTLARI.md).
 
 Tarayıcı sürümü için Python 3.9 veya üzeri yeterlidir; ek paket ve internet bağlantısı gerektirmez. Mac masaüstü sürümü de mevcut Python 3 kurulumunu kullanır. Windows EXE Python'u içinde paketler; oluşturulduktan sonra kullanıcıya Python kurdurmaz.
 
@@ -8,7 +8,7 @@ Tarayıcı sürümü için Python 3.9 veya üzeri yeterlidir; ek paket ve intern
 
 1. Mac'te **SFP Seri Numaraları.app** dosyasını açın. Uygulama kendi penceresinde açılır; Terminal gerekmez. `.app` dosyası `serial_number.py` ve `ui` klasörüyle aynı klasörde kalmalıdır. **Baslat.command** da bu uygulamayı açar. Windows'ta hazırlanmış EXE'yi açın; EXE henüz oluşturulmadıysa aşağıdaki Windows bölümünü izleyin.
 2. Tarayıcı sürümünü kullanmak isterseniz bu klasörde `python3 serial_number.py` veya Windows'ta **Baslat.bat** çalıştırın; `http://127.0.0.1:8765` açılır. Yalnızca bu yöntemle açılan sunucu için terminal penceresini açık tutun. Aynı liste zaten açıksa mevcut sunucu kullanılır.
-3. **Karekod okut** alanına tıklayıp okuyucuyla okutun. Okuyucunun okuma sonu Enter tuşu gönderiyorsa kayıt otomatik eklenir. Elle yapıştırırken Enter'a veya **Seri numarasını ekle** düğmesine basın. Birden fazla karekodu ayrı satırlarda yapıştırabilirsiniz.
+3. **Karekod okut** alanına tıklayıp okuyucuyla okutun. Okuyucunun okuma sonu Enter veya Tab tuşu gönderiyorsa kayıt otomatik eklenir; odak girişte kalır. Elle yapıştırırken Enter'a veya **Seri numarasını ekle** düğmesine basın. Birden fazla karekodu ayrı satırlarda yapıştırabilirsiniz.
 4. Mevcut dosyalar için **Dosya seçin** ile `.xlsx`, `.csv`, `.tsv` veya `.txt` seçin. Excel'in tüm çalışma sayfaları ve hücreleri taranır. Başlıklar ve karekod içermeyen hücreler atlanır; bozuk karekodların konumu gösterilir. Formüller çalıştırılmaz ve formüllü hücreler okunmaz. Şifreli Excel ve eski `.xls` desteklenmez; Excel'den şifresiz `.xlsx` olarak kaydedin.
 5. **Tümünü kopyala** ile Excel'e tek sütun yapıştırın. **TXT indir** veya **CSV indir** ile yalnızca seri numaralarını alın. CSV'de bir başlık satırı bulunur. Sadece rakamlardan oluşan veya sıfırla başlayan seri numaraları için CSV'yi Excel'in **Veri → Metin/CSV'den** menüsüyle açıp sütun türünü **Metin** seçin; Excel doğrudan açılan CSV değerlerini sayıya çevirebilir. TXT ham değerleri aynen korur.
 
@@ -20,14 +20,15 @@ Kayıt listesindeki **Listeyi sıfırla** düğmesiyle yeni bir listeye başlaya
 
 ## Okuyucu ayarı
 
-Okuyucu klavye gibi yazan USB HID modunda çalışmalı ve okuma sonunda **Enter** göndermeli. Seri alanını ayıran GS (ASCII 29 / `0x1D`) korunmalı. Uygulama şunları tanır:
+Okuyucu klavye gibi yazan USB HID modunda çalışmalı; okuma sonu için **Enter** önerilir. Uygulama şunları tanır:
 
 - Görünen `␝`, `␞`, `␄` karakterleri.
+- Okuyucunun GS yerine gönderdiği `]` ayracı: `]Sseri]Q1` → `seri`.
 - Gerçek ASCII GS, RS ve EOT kontrol karakterleri.
 - Excel/metin gösterimleri: `_x001D_`, `\x1d`, `\u001d` (RS ve EOT karşılıkları da kabul edilir).
 - Arayüz odaktayken **Ctrl+] → GS**, **Ctrl+Shift+6 → RS**, **Ctrl+D → EOT**. **Ctrl+M/J** kayıt gönderir.
 
-GS ayırıcısını silen veya başka tuşa çeviren okuyucularda cihazın veri biçimlendirme ayarından GS'yi görünen `␝` karakterine dönüştürün. Ayırıcılar kaybolursa program tahmin etmez; açıklamalı hata gösterir. Fiziksel okuyucuyla ilk denemeyi, etiket üzerindeki seriyle karşılaştırın. Farklı okuyucuların kontrol karakteri gönderme biçimleri değişebilir.
+GS'nin `]` olarak gelmesi desteklenir; bu okuyucu için ayırıcıyı yeniden ayarlamak gerekmez. Ayırıcılar tamamen kaybolursa program tahmin etmez; açıklamalı hata gösterir. Fiziksel okuyucuyla ilk denemeyi etiket üzerindeki seriyle karşılaştırın. Excel'de hücreler arasında aşırı ilerleme varsa cihazın okuma sonu (suffix) tuşlarını kontrol edin. Menü adları modele göre değişir.
 
 ## Arayüzsüz toplu işlem
 
@@ -50,7 +51,7 @@ Başlık ve açıklamalar `ui/index.html`, işlem mesajları `ui/app.js`, görü
 
 Bu bilgisayarda Windows EXE henüz derlenmedi. İki yöntem hazırdır:
 
-1. **Windows bilgisayarda:** Kaynak klasörünü kopyalayın. Derleme bilgisayarında Python 3.12 ve internet bağlantısı bulunmalı. **Windows_EXE_Olustur.bat** dosyasını açın. Bağımlılıklar projeye özel `.build/windows-venv` ortamına kurulur. Paket `dist/SFP-Windows` içinde oluşur. Bu klasörün tamamını kullanıcıya verin; kullanıcı Python kurmadan EXE'yi açabilir. Microsoft Edge WebView2 Runtime gereklidir: [resmi indirme sayfası](https://developer.microsoft.com/microsoft-edge/webview2/).
+1. **Windows bilgisayarda:** Yeni kaynak paketini ayrı bir klasöre çıkarın. Derleme bilgisayarında Python 3.12 ve internet bağlantısı bulunmalı. **Windows_EXE_Olustur.bat** dosyasını açın; doğru Python sürümü kontrol edilir. Bağımlılıklar projeye özel `.build/windows-venv` ortamına kurulur. Paket `dist/SFP-Windows` içinde oluşur; `SURUM.txt` dosyasında sürümü kontrol edin. Bu klasörün tamamını kullanıcıya verin; kullanıcı Python kurmadan EXE'yi açabilir. Microsoft Edge WebView2 Runtime gereklidir: [resmi indirme sayfası](https://developer.microsoft.com/microsoft-edge/webview2/).
 2. **GitHub üzerinden:** Kaynakları, `desktop` klasörünü, `METINLERI_DUZENLEME.md` dosyasını ve gizli `.github/workflows/windows-exe.yml` dosyasını deponuza yükleyin. GitHub'da **Actions → Windows EXE oluştur → Run workflow** seçin. Başarılı çalışmanın **Artifacts** bölümündeki **SFP-Windows** paketini indirin. Akış, EXE üretildikten sonra paket dosyalarını ve yerel sunucuyu geçici kayıtlarla kontrol eder. Gerçek Windows arayüzü ve fiziksel okuyucu ayrıca denenmelidir.
 
 Windows paketi ve Mac `.app` birbirinden ayrıdır. Windows derlemesinde imzalama yapılmaz. Derleme araçları: [PyInstaller](https://pyinstaller.org/en/stable/) ve [pywebview](https://pywebview.flowrl.com/guide/freezing.html).
@@ -65,6 +66,7 @@ Swift pencere kodu `desktop/macos.swift` içindedir. Apple Command Line Tools y�
 
 ```bash
 python3 -m unittest discover -s tests -v
+node --test tests/scanner_input.test.cjs
 ```
 
-Testler örnek serileri, farklı ayırıcıları, hatalı/çoklu alanları, dosyadan aktarmayı, kalıcı kayıtları, tekrarları, HTTP uçlarını ve dışa aktarmayı denetler. Fiziksel okuyucu doğrulaması ayrıca yapılmalıdır.
+Testler eski ve yeni okuyucu çıktılarının aynı serileri verdiğini, farklı ayırıcıları, hatalı/çoklu alanları, dosyadan aktarmayı, kalıcı kayıtları, tekrarları, HTTP uçlarını, dışa aktarmayı ve Tab/Enter ile odak davranışını denetler. JavaScript testleri için Node.js gerekir; EXE'yi oluşturmak veya çalıştırmak için Node.js gerekmez. Fiziksel okuyucu doğrulaması ayrıca yapılmalıdır.
