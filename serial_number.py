@@ -27,7 +27,7 @@ from xml.etree import ElementTree as ET
 ROOT = Path(__file__).resolve().parent
 DEFAULT_DB = ROOT / "data" / "seri_numaralari.sqlite3"
 APP_ID = "sfp-serial-number"
-APP_VERSION = "1.1.0"
+APP_VERSION = "1.1.1"
 GS, RS, EOT = "\x1d", "\x1e", "\x04"
 MAX_UPLOAD = 20 * 1024 * 1024
 MAX_EXPANDED = 60 * 1024 * 1024

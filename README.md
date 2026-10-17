@@ -1,6 +1,6 @@
 # SFP Seri Numaraları
 
-Sürüm **1.1.0**. Karekod içindeki `␝S` ile sonraki `␝` veya `]S` ile sonraki `]` arasını alır, baştaki alan tanımlayıcı `S` harfini çıkarır. Örneğin `]SHA20230241879]10D2023` → `HA20230241879`. Sabit seri uzunluğu kullanılmaz; Q1/10D ve sonraki alanlar alınmaz. [Okuyucu örnekleri ve güncelleme notları](OKUYUCU_NOTLARI.md).
+Sürüm **1.1.1**. Karekod içindeki `␝S` ile sonraki `␝` veya `]S` ile sonraki `]` arasını alır, baştaki alan tanımlayıcı `S` harfini çıkarır. Örneğin `]SHA20230241879]10D2023` → `HA20230241879`. Sabit seri uzunluğu kullanılmaz; Q1/10D ve sonraki alanlar alınmaz. [Okuyucu örnekleri ve güncelleme notları](OKUYUCU_NOTLARI.md).
 
 Tarayıcı sürümü için Python 3.9 veya üzeri yeterlidir; ek paket ve internet bağlantısı gerektirmez. Mac masaüstü sürümü de mevcut Python 3 kurulumunu kullanır. Windows EXE Python'u içinde paketler; oluşturulduktan sonra kullanıcıya Python kurdurmaz.
 
@@ -51,8 +51,10 @@ Başlık ve açıklamalar `ui/index.html`, işlem mesajları `ui/app.js`, görü
 
 Bu bilgisayarda Windows EXE henüz derlenmedi. İki yöntem hazırdır:
 
-1. **Windows bilgisayarda:** Yeni kaynak paketini ayrı bir klasöre çıkarın. Derleme bilgisayarında Python 3.12 ve internet bağlantısı bulunmalı. **Windows_EXE_Olustur.bat** dosyasını açın; doğru Python sürümü kontrol edilir. Bağımlılıklar projeye özel `.build/windows-venv` ortamına kurulur. Paket `dist/SFP-Windows` içinde oluşur; `SURUM.txt` dosyasında sürümü kontrol edin. Bu klasörün tamamını kullanıcıya verin; kullanıcı Python kurmadan EXE'yi açabilir. Microsoft Edge WebView2 Runtime gereklidir: [resmi indirme sayfası](https://developer.microsoft.com/microsoft-edge/webview2/).
-2. **GitHub üzerinden:** Kaynakları, `desktop` klasörünü, `METINLERI_DUZENLEME.md` dosyasını ve gizli `.github/workflows/windows-exe.yml` dosyasını deponuza yükleyin. GitHub'da **Actions → Windows EXE oluştur → Run workflow** seçin. Başarılı çalışmanın **Artifacts** bölümündeki **SFP-Windows** paketini indirin. Akış, EXE üretildikten sonra paket dosyalarını ve yerel sunucuyu geçici kayıtlarla kontrol eder. Gerçek Windows arayüzü ve fiziksel okuyucu ayrıca denenmelidir.
+1. **Windows bilgisayarda:** Yeni kaynak paketini ayrı bir klasöre çıkarın. Derleme bilgisayarında Python 3.11–3.15 ve internet bağlantısı bulunmalı; mevcut Python 3.15 kurulumunuzu kullanabilirsiniz. **Windows_EXE_Olustur.bat** dosyasını açın; `py -3`, `python` veya `python3` ile yüklü Python bulunur ve kullanılan sürüm ekrana yazılır. Bağımlılıklar Python sürümü ve mimarisine özel `.build/windows-venv-py315-win-amd64` gibi bir ortama kurulur. Önceden 3.12 ile oluşturulmuş ortam yeniden kullanılmaz. Paket `dist/SFP-Windows` içinde oluşur; `SURUM.txt` dosyasında sürümü kontrol edin. Bu klasörün tamamını kullanıcıya verin; kullanıcı Python kurmadan EXE'yi açabilir. Microsoft Edge WebView2 Runtime gereklidir: [resmi indirme sayfası](https://developer.microsoft.com/microsoft-edge/webview2/).
+2. **GitHub üzerinden:** Kaynakları, `desktop` klasörünü, `METINLERI_DUZENLEME.md` dosyasını ve gizli `.github/workflows/windows-exe.yml` dosyasını deponuza yükleyin. GitHub'da **Actions → Windows EXE oluştur → Run workflow** seçin. Başarılı çalışmanın **Artifacts** bölümündeki **SFP-Windows** paketini indirin. Akış Python 3.15 kullanır; EXE üretildikten sonra paket dosyalarını ve yerel sunucuyu geçici kayıtlarla kontrol eder. Gerçek Windows arayüzü ve fiziksel okuyucu ayrıca denenmelidir.
+
+Oluşturucu Python 3.12 sürümüne sabitlenmez. Python 3.15 desteği bulunan [pythonnet 3.2.1](https://pypi.org/project/pythonnet/3.2.1/) ve [PyInstaller 6.22.3](https://pypi.org/project/pyinstaller/6.22.3/) kullanılır.
 
 Windows paketi ve Mac `.app` birbirinden ayrıdır. Windows derlemesinde imzalama yapılmaz. Derleme araçları: [PyInstaller](https://pyinstaller.org/en/stable/) ve [pywebview](https://pywebview.flowrl.com/guide/freezing.html).
 

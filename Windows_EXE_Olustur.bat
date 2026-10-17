@@ -4,21 +4,28 @@ set "PYTHONUTF8=1"
 cd /d "%~dp0"
 where py >nul 2>nul
 if errorlevel 1 goto python_path
-py -3.12 -c "import sys; sys.exit(0 if sys.version_info[:2] == (3, 12) else 1)" >nul 2>nul
+py -3 -c "import sys; sys.exit(0 if sys.version_info.major == 3 else 1)" >nul 2>nul
 if errorlevel 1 goto python_path
-py -3.12 desktop\build_windows.py
+py -3 desktop\build_windows.py
 if errorlevel 1 goto failed
 goto done
 
 :python_path
-python -c "import sys; sys.exit(0 if sys.version_info[:2] == (3, 12) else 1)" >nul 2>nul
-if errorlevel 1 goto missing_python
+python -c "import sys; sys.exit(0 if sys.version_info.major == 3 else 1)" >nul 2>nul
+if errorlevel 1 goto python3_path
 python desktop\build_windows.py
 if errorlevel 1 goto failed
 goto done
 
+:python3_path
+python3 -c "import sys; sys.exit(0 if sys.version_info.major == 3 else 1)" >nul 2>nul
+if errorlevel 1 goto missing_python
+python3 desktop\build_windows.py
+if errorlevel 1 goto failed
+goto done
+
 :missing_python
-echo Python 3.12 bulunamadi. Once python.org uzerinden Python 3.12 kurun.
+echo Python bulunamadi. Python 3.11-3.15 kurun ve bu dosyayi tekrar acin.
 pause
 exit /b 1
 

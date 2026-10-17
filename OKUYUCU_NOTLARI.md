@@ -1,4 +1,4 @@
-# Karekod okuyucu — sürüm 1.1.0
+# Karekod okuyucu — sürüm 1.1.1
 
 Seri numarası, bir alan ayracının hemen ardından gelen **S** harfinden sonra başlar ve **bir sonraki alan ayracından hemen önce** biter. Sabit karakter sayısı kullanılmaz. Baştaki S alan tanımlayıcısı çıkarılır; serinin kendi S harfi veya baştaki sıfırları korunur.
 
@@ -29,6 +29,8 @@ Excel'de görülen hücre ilerlemesi uygulama koduyla değiştirilemez. Okuyucun
 
 ## Windows'a güncellemeyi aktarma
 
-Eski EXE'nin yalnızca `ui` klasörünü değiştirmek yeterli değildir: seri numarasını ayıklayan Python kodu EXE'nin içindedir. Yeni kaynak paketini ayrı bir klasöre çıkarın. Windows'ta Python 3.12 kurulu ve internet bağlantısı açıkken **Windows_EXE_Olustur.bat** dosyasını çalıştırın.
+Eski EXE'nin yalnızca `ui` klasörünü değiştirmek yeterli değildir: seri numarasını ayıklayan Python kodu EXE'nin içindedir. Yeni kaynak paketini ayrı bir klasöre çıkarın. Windows'ta Python 3.11–3.15 (mevcut Python 3.15 dahil) kurulu ve internet bağlantısı açıkken **Windows_EXE_Olustur.bat** dosyasını çalıştırın.
 
-Yeni paket `dist/SFP-Windows` klasörüne yazılır. EXE ile yanındaki `ui` klasörünü birlikte kullanın. `SURUM.txt` içinde **1.1.0** yazmalıdır. Çalışan eski uygulamayı kapattıktan sonra yeni EXE'yi açın. Önceki kayıtlar aynı kullanıcı kayıt klasöründe tutulur.
+Yeni paket `dist/SFP-Windows` klasörüne yazılır. EXE ile yanındaki `ui` klasörünü birlikte kullanın. `SURUM.txt` içinde **1.1.1** yazmalıdır. Çalışan eski uygulamayı kapattıktan sonra yeni EXE'yi açın. Önceki kayıtlar aynı kullanıcı kayıt klasöründe tutulur.
+
+Sürüm 1.1.1, oluşturucudaki Python 3.12 zorunluluğunu kaldırır ve pythonnet bağımlılığını 3.15 destekleyen sürüme günceller. Kullanılan Python sürümü terminalde ve oluşturulan `SURUM.txt` içinde görünür. Eski derleme ortamlarıyla karışmaması için her Python sürümü ve mimarisi ayrı sanal ortam kullanır.

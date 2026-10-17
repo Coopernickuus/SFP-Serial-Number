@@ -1,6 +1,6 @@
 # Windows uygulaması
 
-Sürüm 1.1.0: Gerçek/görünen GS yanında `]` ayracı da desteklenir. Seri S'den sonraki ilk ayırıcıda biter. Okuma sonu Enter veya Tab kayıt yapar ve giriş odağı korunur. Ayrıntılar **OKUYUCU_NOTLARI.md** dosyasındadır.
+Sürüm 1.1.1: Gerçek/görünen GS yanında `]` ayracı da desteklenir. Seri S'den sonraki ilk ayırıcıda biter. Okuma sonu Enter veya Tab kayıt yapar ve giriş odağı korunur. Ayrıntılar **OKUYUCU_NOTLARI.md** dosyasındadır.
 
 1. İndirdiğiniz ZIP dosyasını bir klasöre çıkarın.
 2. **SFP Seri Numaralari.exe** dosyasına çift tıklayın.
