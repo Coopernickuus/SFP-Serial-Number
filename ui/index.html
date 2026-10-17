@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="sfp-token" content="__TOKEN__">
+  <title>SFP · Seri Numaraları</title>
+  <link rel="stylesheet" href="/style.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <main>
+    <header><div class="brand"><span class="mark" aria-hidden="true">▥</span> SFP <span class="brand-divider">/</span> Seri Numaraları</div><span class="local"><i></i> Bu bilgisayarda kaydedilir</span></header>
+    <section class="intro"><p class="eyebrow">KAREKODDAN KAYDA</p><h1>Okutun. Seri numarası kaydedilsin.</h1><p>Karekod içindeki <code>␝S…␝</code> alanı ayıklanır. Baştaki S çıkarılır, seri numarası listenize eklenir.</p></section>
+    <div class="inputs">
+      <section class="card scan-card">
+        <div class="section-heading"><span class="step">01</span><h2>Karekod okut</h2><span id="focus-state" class="focus-state">Okuyucu hazır</span></div>
+        <label for="scan">Okuyucuyla bu alana okutun veya karekod metnini yapıştırın.</label>
+        <textarea id="scan" rows="4" autofocus spellcheck="false" autocomplete="off" placeholder="[)>␞06␝1P…␝S…␝…"></textarea>
+        <div class="scan-actions"><span><kbd>Enter</kbd> kaydeder · <kbd>Shift + Enter</kbd> yeni satır</span><button id="save" class="primary">Seri numarasını ekle <span aria-hidden="true">↗</span></button></div>
+        <details><summary>Okuyucu ayarı ve ayırıcı karakterler</summary><p>Okuyucuyu klavye (USB HID) modunda, okuma sonunda <strong>Enter</strong> gönderecek şekilde kullanın. GS ayırıcısı (ASCII 29) veride korunmalıdır. Görünen ␝ karakteri de kabul edilir. GS siliniyorsa okuyucu ayarından ␝ karakterine dönüştürün. Bu ayar cihaz modeline göre değişir.</p><p>Alan odaktayken Ctrl+] ile GS gönderen okuyucular da desteklenir. İlk fiziksel okutmayı bilinen bir seri numarasıyla karşılaştırın.</p></details>
+      </section>
+      <section class="card import-card">
+        <div class="section-heading"><span class="step">02</span><h2>Dosyadan aktar</h2></div>
+        <p>Excel’in tüm sayfalarındaki karekodlar taranır ve aynı listeye eklenir.</p>
+        <label class="file-label" for="file"><span class="file-icon" aria-hidden="true">↥</span><strong>Dosya seçin</strong><span>XLSX, CSV, TSV veya TXT · en fazla 20 MB</span><input id="file" type="file" accept=".xlsx,.csv,.tsv,.txt"></label>
+        <p class="small">Aynı seri numarası ikinci kez eklenmez. Başlıklar ve boş hücreler atlanır.</p>
+      </section>
+    </div>
+    <section id="feedback" class="feedback" role="status" aria-live="polite" hidden><strong id="feedback-title"></strong><div id="feedback-detail"></div><ul id="feedback-errors"></ul></section>
+    <section class="card results">
+      <div class="results-top"><div><p class="eyebrow">KAYDEDİLENLER</p><h2>Seri numarası listesi <span id="total">0</span></h2></div><div class="exports"><button id="copy">Tümünü kopyala</button><a class="button" href="/export?format=txt" download>TXT indir</a><a class="button" href="/export?format=csv" download>CSV indir</a><button id="reset" class="danger" disabled>Listeyi sıfırla</button></div></div>
+      <div class="table-tools"><input id="search" type="search" placeholder="Listede seri numarası ara…" aria-label="Seri numarası ara"><span id="list-info">Kayıtlar yükleniyor…</span></div>
+      <div class="table-wrap"><table><thead><tr><th scope="col">SERİ NUMARASI</th><th scope="col">KAYIT ZAMANI</th><th scope="col">KAYNAK</th></tr></thead><tbody id="records"></tbody></table></div>
+      <div id="empty" class="empty" hidden><span aria-hidden="true">⌁</span><strong>İlk seri numaranızı ekleyin.</strong><p>Karekod okutabilir veya Excel dosyanızı seçebilirsiniz.</p></div>
+    </section>
+    <footer><span>Her başarılı okuma otomatik kaydedilir.</span><span>Uygulamayı kapatıp açtığınızda listeniz korunur.</span></footer>
+  </main>
+</body>
+</html>

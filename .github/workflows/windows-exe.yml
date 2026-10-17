@@ -1,0 +1,32 @@
+name: Windows EXE oluştur
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+      - name: Testleri çalıştır
+        run: python -m unittest discover -s tests -v
+        env:
+          PYTHONUTF8: '1'
+      - name: EXE oluştur ve doğrula
+        run: python desktop/build_windows.py
+        env:
+          PYTHONUTF8: '1'
+      - name: Windows paketini yükle
+        uses: actions/upload-artifact@v7
+        with:
+          name: SFP-Windows
+          path: dist/SFP-Windows/
+          if-no-files-found: error
+          retention-days: 14

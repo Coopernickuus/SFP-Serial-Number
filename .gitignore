@@ -1,0 +1,32 @@
+# Yerel seri kayıtları ve oluşturulan çıktılar
+/data/
+/outputs/
+*.sqlite
+*.sqlite3
+*.sqlite3-*
+*.db
+*.db-*
+
+# Kullanıcının kaynak Excel dosyaları ve Excel kilit dosyaları
+*.xlsx
+*.xls
+~$*
+
+# Python önbellekleri ve sanal ortamlar
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+
+# Yerel ayarlar ve işletim sistemi dosyaları
+.env
+.env.*
+.DS_Store
+Thumbs.db
+*.log
+/.build/
+/dist/
+/build/
+/*.spec
+/SFP Seri Numaraları.app/
